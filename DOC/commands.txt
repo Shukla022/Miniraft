@@ -1,0 +1,39 @@
+1️⃣ START the entire system (from scratch)
+cd c:\Users\nagad\OneDrive\Desktop\cloud_mini_raft_project
+docker-compose up -d
+
+2️⃣ CHECK status of all services
+docker-compose ps
+
+
+3️⃣ VIEW logs of a specific service
+# Frontend logs
+docker-compose logs frontend --tail=20
+
+# Gateway logs
+docker-compose logs gateway --tail=20
+
+# Replica logs
+docker-compose logs replica1 --tail=20
+docker-compose logs replica2 --tail=20
+docker-compose logs replica3 --tail=20
+
+4️⃣ STOP all containers (keep data)
+docker-compose stop
+
+5️⃣ START again (after stopping)
+docker-compose start
+
+6️⃣ RESTART all containers
+docker-compose restart
+
+9️⃣ TEST FAILOVER (kill one replica)
+
+# Kill replica1
+docker-compose kill replica1
+
+# Check status
+docker-compose ps -a
+
+# Restart replica1
+docker-compose up -d replica1
