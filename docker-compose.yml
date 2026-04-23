@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "80:3000"
+    networks:
+      - raft-network
+    depends_on:
+      - gateway
+
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - REPLICA_HOSTS=replica1:5001,replica2:5002,replica3:5003
+    networks:
+      - raft-network
+    depends_on:
+      - replica1
+      - replica2
+      - replica3
+    command: npm start
+
+  replica1:
+    build: ./replica1
+    container_name: replica1
+    expose:
+      - "5001"
+    ports:
+      - "5001:5001"
+      - "9001:9001"
+    environment:
+      - REPLICA_ID=1
+      - REPLICA_HOST=replica1
+      - REPLICA_PORT=5001
+      - DEBUG_PORT=9001
+      - PEERS=replica2:5002,replica3:5003
+    networks:
+      - raft-network
+    command: npm start
+
+  replica2:
+    build: ./replica2
+    container_name: replica2
+    expose:
+      - "5002"
+    ports:
+      - "5002:5002"
+      - "9002:9002"
+    environment:
+      - REPLICA_ID=2
+      - REPLICA_HOST=replica2
+      - REPLICA_PORT=5002
+      - DEBUG_PORT=9002
+      - PEERS=replica1:5001,replica3:5003
+    networks:
+      - raft-network
+    command: npm start
+
+  replica3:
+    build: ./replica3
+    container_name: replica3
+    expose:
+      - "5003"
+    ports:
+      - "5003:5003"
+      - "9003:9003"
+    environment:
+      - REPLICA_ID=3
+      - REPLICA_HOST=replica3
+      - REPLICA_PORT=5003
+      - DEBUG_PORT=9003
+      - PEERS=replica1:5001,replica2:5002
+    networks:
+      - raft-network
+    command: npm start
+
+networks:
+  raft-network:
+    driver: bridge
